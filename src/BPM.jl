@@ -47,7 +47,9 @@ frequency.
 
 # Keyword Arguments
  - `laminar = false`: Flag(s) to compute laminar boundary layer noise
- - `turbulent = true`: Flag(s) to compute turbulent boundary layer noise
+ - `turbulent_pressure = true`: Flag(s) to compute turbulent boundary layer-pressure side noise
+ - `turbulent_suction = true`: Flag(s) to compute turbulent boundary layer-suction side noise
+ - `turbulent_separation = true`: Flag(s) to compute turbulent boundary layer separation noise
  - `blunt = true`: Flag(s) to compute blunt trailing edge noise
  - `tip = true`: Flag(s) to compute tip noise
  - `trip = true`: Flag(s) to trip boundary layer
@@ -60,7 +62,7 @@ frequency.
         so that the outputs are smooth and continuous.
 """
 function sound_pressure_levels(ox, oy, oz, V, Ω, B, r, c, c1, h, alpha, psi, nu, c0;
-    laminar=false, turbulent=true, blunt=true, tip=true, trip=true, round=true, weighted=true,
+    laminar=false, turbulent_pressure=true, turbulent_suction, turbulent_separation, blunt=true, tip=true, trip=true, round=true, weighted=true,
     nbeta=ceil(Int, 8/B), f=default_f, AdB=default_AdB, smooth=true)
 
     # get floating point type
@@ -144,10 +146,14 @@ function sound_pressure_levels(ox, oy, oz, V, Ω, B, r, c, c1, h, alpha, psi, nu
                     add_laminar_pressure!(p2, f, r_obs, θ_obs, ϕ_obs, Lm, cm, am, Vm, c0, nu, smooth)
                 end
 
-                if typeof(turbulent) <: AbstractVector ? turbulent[k] : turbulent
-                    # add turbulent boundary layer pressure contributions
-                    add_turbulent_pressure!(p2, f, r_obs, θ_obs, ϕ_obs, Lm, cm, am, Vm, c0, nu, tripped, smooth)
+                _turbulent_pressure = typeof(turbulent_pressure) <: AbstractVector ? turbulent_pressure[k] : turbulent_pressure
+                _turbulent_suction = typeof(turbulent_suction) <: AbstractVector ? turbulent_suction[k] : turbulent_suction
+                _turbulent_separation = typeof(turbulent_separation) <: AbstractVector ? turbulent_separation[k] : turbulent_separation
+                if _turbulent_pressure || _turbulent_suction || _turbulent_separation
+                    add_turbulent_pressure!(p2, f, r_obs, θ_obs, ϕ_obs, Lm, cm, am, Vm, c0, nu, tripped, smooth;
+                                            pressure=_turbulent_pressure, suction=_turbulent_suction, separation=_turbulent_separation)
                 end
+
 
                 if typeof(blunt) <: AbstractVector ? blunt[k] : blunt
                     # add blunt trailing edge pressure contributions
