@@ -46,7 +46,8 @@ pyplot()
 
     # define function which modifies all the interesting variables
     Vfunc = (x) -> BPM.sound_pressure_levels(ox, oy, oz, x*V, Ω, B, r, c, c1, h, alpha, psi, nu, c0;
-        turbulent=true, blunt=true, tip=false, weighted=false, smooth=false)[1]
+        turbulent_pressure=true, turbulent_suction=true, turbulent_separation=true,
+        blunt=true, tip=false, weighted=false, smooth=false)[1]
 
     smooth_Vfunc = (x) -> BPM.sound_pressure_levels(ox, oy, oz, x*V, Ω, B, r, c, c1, h, alpha, psi, nu, c0;
         turbulent=true, blunt=true, tip=false, weighted=false, smooth=true)[1]
@@ -58,10 +59,12 @@ pyplot()
     plot!(x*V, smooth_Vfunc.(x), label="")
 
     afunc = (x) -> BPM.sound_pressure_levels(ox, oy, oz, V, Ω, B, r, c, c1, h, x.*alpha, psi, nu, c0;
-        turbulent=true, blunt=true, tip=false, weighted=false, smooth=false)[1]
+        turbulent_pressure=true, turbulent_suction=true, turbulent_separation=true,
+        blunt=true, tip=false, weighted=false, smooth=false)[1]
 
     smooth_afunc = (x) -> BPM.sound_pressure_levels(ox, oy, oz, V, Ω, B, r, c, c1, h, x.*alpha, psi, nu, c0;
-        turbulent=true, blunt=true, tip=false, weighted=false, smooth=true)[1]
+        turbulent_pressure=true, turbulent_suction=true, turbulent_separation=true,
+        blunt=true, tip=false, weighted=false, smooth=true)[1]
 
     x = range(0.0, 2.0, length=1000)
     plot(x * alpha[1], afunc.(x), label="",
